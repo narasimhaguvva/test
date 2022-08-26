@@ -1,0 +1,31 @@
+pipeline {
+    agent any 
+       triggers {
+        pollSCM "* * * * *"
+       }
+    stages {
+        stage('Git SCM') {
+            steps {
+                git 'https://github.com/sureshguvva/pets.git'
+            }
+        }
+        stage('Build Application') { 
+            steps {
+                echo '=== Building Petclinic Application ==='
+                sh 'mvn -B -DskipTests clean package' 
+            }
+        }
+        stage('Test Application') {
+            steps {
+                echo '=== Testing Petclinic Application ==='
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        
+    }
+}
